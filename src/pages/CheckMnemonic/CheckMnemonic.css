@@ -1,0 +1,53 @@
+.h2_mini {
+  width: 70%;
+    font-size: 14px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.circle-text-confirm-item
+{
+ font-size: small;
+ width: 120px;
+ height: 30px;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ border: 1px solid #ff8101; /* 테두리 스타일 */
+ box-shadow: 0 0 0 2px #ffd8b0;
+ border-radius: 12px; /* 동그란 테두리로 만들기 */
+ 
+ margin-inline: 20px;
+ margin-block: 15px;
+ background-color: white; /* 아이템 배경색 */
+ position: relative; /* 포지션 설정 추가 */
+}
+.circle-text-input {
+    text-align: center;
+    border: none;
+    outline: none;
+    width: 100%;
+    background-color: transparent; /* Optional: Transparent background */
+  }
+  .circle-text-index {
+    position: absolute;
+    top: 50%;
+    left: -20px; /* 위치 조정을 위해 값 조절 */
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: black;
+  }
+  .start_create_btn{
+    margin-top: 20px;
+    padding: 10px;
+    color: white;
+    font-size: 14px;
+    font-weight: 550;
+    border: none;
+    border-radius: 30px;
+    background-color: #94b0e5;
+    width: 90%;
+    max-width: 300px;
+  }
+  .start_create_btn.checked {
+    background-color: #4169E1;
+  }

@@ -1,0 +1,93 @@
+.accounts_container{
+
+    width: 300px;
+    height: 350px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    box-shadow : rgba(0,0,0,0.5) 0 0 0 9999px;
+}
+
+  
+.accounts_header{
+    width: 300px;
+    height: 40px;
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+}
+.accounts_header_title {
+    color: black;
+    font-size: 15px;  
+    font-weight: 550; 
+}
+.exit_btn{
+    font-weight: 550;
+    margin-right: 10px;
+    position: absolute;
+    right: 0;
+    font-size: 16px;
+}
+.accounts_body{
+    overflow: auto;
+    width: 300px;
+    height: 310px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.accounts_body::-webkit-scrollbar {
+    display: none;
+  }
+.accounts_box {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+.account_item {
+    cursor: pointer;
+    width: 95%;
+    height: 50px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.account_img{
+    width: 17px;
+    height: 17px;
+}
+.item_name {
+    margin-left: 8px;
+    font-size: 14px;
+}
+.add_account {
+    cursor: pointer;
+    margin-top: 12px;
+    display: flex;
+    flex-direction: row;
+    width: 95%;
+    align-items: center;
+    margin-bottom: 12px;
+    height: 20px;
+}
+.plus_img {
+    width: 20px;
+    height: 20px;
+}
+.plus_account_text {
+    margin-left: 5px;
+    font-size: 15px;
+    color: #0A93E2;
+    height: 15px;
+    
+}

@@ -1,0 +1,84 @@
+.resource_container {
+    width: 60%;
+    padding: 8px 16px;
+    min-width: 320px;
+    height: auto;
+    background-color: white;
+    box-shadow:
+    0 9px 7px rgba(0, 0, 0, 0.05), /* 위 */
+    7px 0 7px rgba(0, 0, 0, 0.03), /* 오른쪽 */
+    0 -4px 10px rgba(0, 0, 0, 0.03), /* 아래 */
+    -7px 0 7px rgba(0, 0, 0, 0.03); /* 왼쪽 */
+    display: flex;
+    flex-direction: column;
+}
+
+.resource_box{
+    margin-top: 10px;
+    width: 100%;
+    height: 80px;
+    display: flex;
+    flex-direction: row;
+}
+
+.resource_box.top {
+    margin-top: 10px;
+}
+
+.resource_type {
+    font-size: 14px;
+}
+
+.graph_container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.resource_btn_container{
+    margin-left: 30px;
+    width: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+}
+
+.stake_btn {
+    width: 120px;
+    height: 30px;
+    border: none;
+    background-color: #2084CF;
+    color: white;
+    font-weight: 550;
+    border-radius: 5px;
+    font-size: 13px;
+}
+
+.un_stake_btn {
+
+    margin-top: 5px;
+    width: 120px;
+    height: 30px;
+    border: 2px solid #2084CF;
+    background-color: white;
+    font-weight: 550;
+    border-radius: 5px;
+    font-size: 13px;
+}
+
+.resource_used_text{
+    font-size: 12px;
+}
+
+@media screen and (max-width: 350px) {
+    .resource_container{
+        padding: 0;
+    }
+    .graph_container {
+        margin-left: 10px;
+    }
+    .resource_btn_container {
+        margin-right: 10px;
+    }
+}

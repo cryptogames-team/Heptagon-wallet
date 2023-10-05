@@ -1,0 +1,95 @@
+.root {
+    overflow: none;
+    width: 320px;
+    height: 100%;
+}
+.login_container {
+    background-color: white;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.login_headers {
+    width: 100%;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.login_title{
+    font-size: 20px;
+    color: black;
+    font-weight: 550;
+    margin-bottom: 7px;
+}
+.login_content {
+    text-align: center;
+    font-size: 12px;
+    color: black;
+}
+.login_body {
+    margin-top: 10px;
+    overflow: auto;
+    min-height: 300px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.login_body::-webkit-scrollbar {
+    display: none;
+  }
+.account_item_box{
+    width: 90%;
+    height: 50px;
+    border: 1px solid black;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 7px;
+}
+.account_img {
+    width: 17px;
+    height: 20px;
+    margin-right: 5px;
+    margin-left: 5px;
+}
+.account_name{
+    font-size: 14px;
+}
+.public_keys{
+    font-size: 14px;
+}
+.login_footer {
+    border-top: 1px solid #DCDCDC;
+    height: 70px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+.cancel_login_btn{
+    margin-right: 10px;
+    height: 40px;
+    width: 40%;
+    border: 2px solid #4169E1;
+    background-color: white;
+    border-radius: 30px;
+    color: black;
+}
+.login_btn{
+    height: 40px;
+    width: 40%;
+    border: none;
+    background-color: #4169E1;
+    border-radius: 30px;
+    color: white;
+}

@@ -1,0 +1,174 @@
+.process_container{
+    height: 40px;
+    width: 300px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+.radius_container {
+    width: 25px;
+    height: 25px;
+    border: 2px solid black;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.radius_container.active {
+    border: 2px solid #4169E1;
+}
+.radius_container.clear {
+    border: 2px solid #4169E1;
+    background-color: #4169E1;
+}
+.box {
+    text-align: center;
+    font-size: 17px;
+    font-weight: 550;
+}
+.box.active {
+    color: #4169E1;
+}
+.box.clear {
+    color: white
+}
+.line {
+    width: 60px;
+    height: 2px;
+    background-color: black;
+}
+.line.clear {
+    background-color: #4169E1;
+}
+.process_text_container{
+    width: 260px;
+    display: flex;
+    flex-direction: row;
+}
+.text_container {
+    width: 33%;
+    text-align: center;
+}
+.text {
+    color: black;
+    font-size: 12px;
+}
+.text.active {
+    color: #4169E1;
+}
+.pw_content_text {
+    width: 90%;
+    text-align: center;
+}
+.register_form {
+    margin-top: 20px;
+    width: 320px;
+}
+.new_pw_text_container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    margin-bottom: 5px;
+}
+.new_pw_text {
+    width: auto;
+    font-size: 16px;
+    font-weight: 550;
+
+}
+.see_pw {
+    cursor: pointer;
+    color: #4169E1;
+    font-size: 13px;
+    position: absolute;
+    width: auto;
+    right: 0;
+}
+.check_pw_text{
+    font-size: 16px;
+    font-weight: 550;
+}
+.input_pw {
+    width: 100%;
+    margin-bottom: 8px;
+    height: 40px;
+    border: 2px solid #DCDCDC;
+    border-radius: 5px;
+}
+.input_pw:focus {
+    outline: 2px solid #4169E1;
+    border: none;
+}
+.input_check_pw{
+    margin-top: 5px;
+    width: 100%;
+    height: 40px;
+    border: 2px solid #DCDCDC;
+    border-radius: 5px;
+}
+.input_check_pw:focus {
+    border: none;
+    outline: 2px solid #4169E1;
+}
+.check_container {
+    margin-top: 8px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+.check_content {
+    margin-left: 8px;
+    font-size: 14px;
+    font-weight: 500;
+}
+.check_box{
+    width: 20px;
+    height: 20px;
+}
+.create_new_wallet_btn{
+    padding: 10px;
+    color: white;
+    font-size: 14px;
+    font-weight: 540;
+    margin-bottom: 15px;
+    border-radius: 30px;
+    background-color: 	#94b0e5;
+    border: none;
+    width: 100%;
+    height: 50px;
+    margin-top: 25px;
+}
+.create_new_wallet_btn.checked{
+    background-color: 	#4169E1;
+}
+.password_strength_container{
+    display: flex;
+    flex-direction: column;
+}
+.password_strength_title {
+    font-size: 15px;
+    margin-bottom: 4px;
+    font-weight: 550;
+}
+.password_strength_content {
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+.password_strength.weak{
+    font-size: 15px;
+    font-weight: 550;
+    color: #DC143C;
+}
+.password_strength.normal{
+    font-size: 15px;
+    font-weight: 550;
+    color: #FFA500;
+}
+.password_strength.safe{
+    font-size: 15px;
+    font-weight: 550;
+    color: 	#32CD32;
+}

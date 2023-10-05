@@ -1,0 +1,193 @@
+.send_token_container{
+    margin-top: 30px;
+    width: 320px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    box-shadow:
+    0 4px 7px rgba(0, 0, 0, 0.03), /* 위 */
+    7px 0 7px rgba(0, 0, 0, 0.03), /* 오른쪽 */
+    0 -6px 7px rgba(0, 0, 0, 0.03), /* 아래 */
+    -7px 0 7px rgba(0, 0, 0, 0.03); /* 왼쪽 */
+}
+.send_text_container {
+    margin-top: 15px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+.send_text {
+    font-size: 18px;
+    font-weight: 540;
+}
+.cancel {
+    font-size: 12px;
+    color: #0376C9;
+    position: absolute;
+    right: 0;
+    margin-right: 15px;
+    cursor: pointer;
+}
+
+.input_account_container {
+    margin-top: 10px;
+    width: 290px;
+    height: 20px;
+    padding: 12px 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #DCDCDC;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+.input_acccount{
+    width: 290px;
+    height: 20px;
+    border: none;
+    font-size: 16px;
+}
+.input_acccount:focus {
+    border: none;
+    outline: none;
+}
+.input_acccount::placeholder {
+    color: #DCDCDC;
+}
+
+.balance_container2 {
+    width: 290px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 54px;
+    margin: 16px 16px 0px;
+
+}
+.balance_symbol{
+    width: 25px;
+    height: 30px;
+}
+.balance_empty {
+    width: 50px;
+}
+.empty_box{
+    padding: 4px;
+    color: #0376C9;
+    font-size: 12px;
+    border: 1px solid #0376C9;
+    border-radius: 25px;
+    cursor: pointer;
+}
+.balance_container_text {
+    height: 21.6px;
+}
+.balance_container_box {
+    height: 54px;
+    display: flex;
+    flex-direction: row;
+    border: 1px solid #DCDCDC;
+    border-radius: 6px;
+    padding: 8px;
+    justify-content: center;
+    align-items: center;
+}
+.balance_quantity_box{
+    width: 145px;
+    margin-left: 10px;
+    display: flex;
+    flex-direction: column;
+    height: 55px;
+    justify-content: center;
+}
+.balance_quantity_symbol{
+    font-weight: 550;
+    font-size: 16px;
+    height: 22px;
+}
+.balance_quantity{
+    font-size: 12px;
+    height: 17px;
+    color: #24272A;
+}
+.quantity_container{
+    width: 290px;
+    display: flex;
+    flex-direction: row;
+    height: 54px;
+    margin: 30px 16px 0px;
+    align-items: center;
+}
+.input_quantity_container {
+
+    border: 1px solid #DCDCDC;
+    border-radius: 6px;
+    padding: 8px;
+    width: 180px;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.input_quantity{
+    min-width: 5px;
+    width: auto;
+    border: none;
+    font-size: 16px;
+}
+.input_quantity::placeholder{
+    color: black;
+}
+
+.input_quantity:focus {
+    outline: none;
+}
+
+.token_line {
+    margin-top: 100px;
+    margin-bottom: 30px;
+    height: 1px;
+    width: 100%;
+    background-color: #DCDCDC;
+}
+.btn_container {
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+.cancel_button{
+    color: #0376C9;
+    border: 1px solid #0376C9;
+    background-color: white;
+    border-radius: 20px;
+    font-size: 12px;
+    height: 40px;
+    margin-right: 5px;
+    width: 130px;
+    padding: 12px 16px;
+}
+.send_button{
+    border: none;
+    border-radius: 20px;
+    color: white;
+    background-color: #0376C9;
+    font-size: 12px;
+    height: 40px;
+    margin-left: 5px;
+    width: 130px;
+    padding: 12px 16px;
+}
+@media screen and (max-width: 350px) {
+    .send_token_container{
+        margin-top: 0px;
+    }
+}
