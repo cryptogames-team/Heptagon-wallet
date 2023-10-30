@@ -63,7 +63,7 @@ const AddAccount = forwardRef((props, ref) =>{
         console.log("갱신된 account 값들",result2);
       
         chrome.storage.local.set({request_state : "main"});
-        
+        fetchData_parent();
       }
     const createAccount = async () => {
         
@@ -135,7 +135,7 @@ const AddAccount = forwardRef((props, ref) =>{
             const new_account = {account_name : accountName, publicKey :publicKey, privateKey : privateKey }
             account_store(new_account); // 계정 생성에 성공하면 해당 계정을 storage에 저장한다.
             alert("계정생성에 성공하였습니다.");
-            fetchData_parent();
+            
             setModalsState(false);
           } else {
             alert("계정생성에 실패하였습니다.")

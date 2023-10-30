@@ -9,6 +9,7 @@ let auth_name = null;
 let data = null;
 let action_account = null;
 let action_name = null;
+let datas = null;
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 
@@ -19,7 +20,7 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
         auth_name = message.auth_name;
         data = JSON.parse(message.data);
         action_account = message.action_account;
-        action_name = message.action_name; // 정보 저장
+        action_name = message.action_name;
 
         // request_state 저장. 이 정보를 통해 index.html이 팝업창에 어떤 ui를 띄어줄지 결정한다.        
         chrome.storage.local.set({request_state : "dapp_trx"}).then(() => {
@@ -47,12 +48,52 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
         sendResponse("디앱 트랜잭션 처리를 위한 index.html 오픈.");
 
     
-    } else if(message.action === "trx_request") {
+    }else if (message.action === "dapp_trxs") {
+      // 디앱 트랜잭션 요청 시
+
+      auth_name = message.auth_name;
+      datas = JSON.parse(message.datas);
+
+      // request_state 저장. 이 정보를 통해 index.html이 팝업창에 어떤 ui를 띄어줄지 결정한다.        
+      chrome.storage.local.set({request_state : "dapp_trxs"}).then(() => {
+          
+          console.log("request_state에 dapp_transaction 저장...")
+          chrome.windows.create({
+              url: "index.html",
+              type: "popup",
+              width: 400,
+              height: 600
+            }, function(data) {
+              popupWindow = data.id;
+              console.log(popupWindow)
+            });
+          
+      })
+
+      chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
+          tab_id_vote = tabs[0].id;
+          console.log("tab id 저장.", tab_id_vote)
+          // 여기에서 tab 변수를 사용하여 원하는 작업을 수행
+        });
+
+
+      sendResponse("디앱 트랜잭션 처리를 위한 index.html 오픈.");
+
+  
+  } else if(message.action === "trx_request") {
 
         console.log("트랜잭션 처리 요청. 계정 정보 조회...")
 
         // 선택된 계정의 이름과 public 키
         trx_process();
+
+
+    } else if(message.action === "trxs_request") {
+
+        console.log("트랜잭션 처리 요청. 계정 정보 조회...")
+
+        // 선택된 계정의 이름과 public 키
+        trxs_process();
 
 
     } else if(message.action === "trx_close") {
@@ -68,7 +109,7 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 });
 
 // 버튼을 누르면 input태그에 있는 auth_name, data, action_account, action_name을 가져온다.
-async function trx_process() {
+async function trxs_process() {
 
     // 계정들을 가져오고
     const result_accounts = await chrome.storage.local.get(['accounts']);
@@ -89,19 +130,49 @@ async function trx_process() {
     const senderPrivateKey = filteredData[0].privateKey;
     console.log("가지고 온 privateKey "+senderPrivateKey)
 
-    const url = "http://221.148.25.234:8989/startTransaction";
+    const url = "http://221.148.25.234:8989/startTransactions";
     const datas = {
         senderPrivateKey,
-        action_account,
-        action_name,
         auth_name,
-        data
+        datas
     };
     
     const response = await postJSON(url, {datas : datas});
     trx_complete(response);    
 }
+async function trx_process() {
 
+  // 계정들을 가져오고
+  const result_accounts = await chrome.storage.local.get(['accounts']);
+  const accounts = result_accounts.accounts;
+
+  console.log("계정 가져오기");
+  console.log(accounts);
+
+  // 그 중에서 account_name에 매칭되는 privateKey를 추출한다.
+  const filteredData = accounts.filter(item => item.account_name === auth_name);
+
+  if (filteredData.length < 0) {
+      console.log('일치하는 데이터를 찾을 수 없습니다.');
+      return false;
+  }
+
+  console.log(filteredData);
+  const senderPrivateKey = filteredData[0].privateKey;
+  console.log("가지고 온 privateKey "+senderPrivateKey)
+
+  const url = "http://221.148.25.234:8989/startTransaction";
+  const datas = {
+      senderPrivateKey,
+      auth_name,
+      data,
+      action_account,
+      action_name
+  };
+  
+  const response = await postJSON(url, {datas : datas});
+  trx_complete(response);    
+}
 function trx_complete (data) {
 
     chrome.tabs.sendMessage(tab_id_vote, { 

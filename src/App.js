@@ -5,6 +5,7 @@ import NewHeader from './pages/NewHeader/NewHeader';
 import StartApp from './pages/StartApp/StartApp';
 import DaapLogin from './pages/DappLogin/DappLogin'
 import DappSign from './pages/DappSign/DappSign'
+import DappSigns from './pages/DappSign/DappSigns'
 import MainPage from './pages/MainPage/MainPage';
 import {
   goBack,
@@ -40,6 +41,11 @@ function App() {
       } else if(storedData == "dapp_trx") {
         let updateData = [];
         updateData.push(<DappSign/>);
+        setComponentsToRender(updateData);
+        
+      } else if(storedData == "dapp_trxs") {
+        let updateData = [];
+        updateData.push(<DappSigns/>);
         setComponentsToRender(updateData);
         
       } else if(storedData == "main") {
