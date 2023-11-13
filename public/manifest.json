@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "지갑 - 병합 - 현성",
+  "name": "지갑 - 병합 - 20231103 수정",
   "description": "디앱 연동 및 자산 조회, 투표",
   "version": "1.0",
   "action": {
@@ -14,13 +14,19 @@
   {
     "js": ["scripts/content_login.js"],
       "matches": [
-      "http://cryptoexplorer.store/*"
+        "*://*/*"
       ]
   } ,
   {
     "js": ["scripts/content_transaction.js"],
       "matches": [
-      "http://cryptoexplorer.store/Vote"
+        "*://*/*"
+      ]
+  },
+  {
+    "js": ["scripts/content_transactions.js"],
+      "matches": [
+        "*://*/*"
       ]
   }
 ]

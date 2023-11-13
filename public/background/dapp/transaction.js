@@ -9,7 +9,7 @@ let auth_name = null;
 let data = null;
 let action_account = null;
 let action_name = null;
-let datas = null;
+let datas_by_front = null;
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 
@@ -52,7 +52,7 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
       // 디앱 트랜잭션 요청 시
 
       auth_name = message.auth_name;
-      datas = JSON.parse(message.datas);
+      datas_by_front = JSON.parse(message.datas);
 
       // request_state 저장. 이 정보를 통해 index.html이 팝업창에 어떤 ui를 띄어줄지 결정한다.        
       chrome.storage.local.set({request_state : "dapp_trxs"}).then(() => {
@@ -134,11 +134,11 @@ async function trxs_process() {
     const datas = {
         senderPrivateKey,
         auth_name,
-        datas
+        datas : datas_by_front
     };
     
     const response = await postJSON(url, {datas : datas});
-    trx_complete(response);    
+    trxs_complete(response);    
 }
 async function trx_process() {
 
@@ -188,6 +188,23 @@ function trx_complete (data) {
             console.log("트랜잭션 팝업 창 닫기 완료 ")            
         });
       });      
+}
+
+function trxs_complete (data) {
+
+  chrome.tabs.sendMessage(tab_id_vote, { 
+      action: "trxs_complete_from_extension", 
+      result: data.result,
+      status : data.status}, (response) => {
+      
+      // 여기에서 response를 사용하여 원하는 작업을 수행
+      console.log("콘텐츠 스크립트로 데이터 전송..", response)
+
+      chrome.storage.local.set({request_state : "main"});
+      chrome.windows.remove(popupWindow, function() {
+          console.log("트랜잭션 팝업 창 닫기 완료 ")            
+      });
+    });      
 }
 
 async function postJSON(url = "", data = {}) {
