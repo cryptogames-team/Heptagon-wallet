@@ -254,6 +254,24 @@ html {
     flex-direction: row;
     position: relative;
 }
+.nft_container {
+    margin-top: 10px;
+    width: 100%;
+    height: auto;
+    padding: 16px 0px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(50px,1fr));
+    gap: 10px;
+}
+.nft_item {
+    width: 100%;
+    overflow: hidden;
+}
+.nft_item img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
 .action_box{
     margin-left: 15px;
     height: 100%;
@@ -305,6 +323,9 @@ html {
     }
     .token_container {
         margin-left: 10px;
+    }
+    .nft_container{
+        margin-left: 0.5px;
     }
     .token_price{
         right: 20px;

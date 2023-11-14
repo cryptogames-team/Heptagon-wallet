@@ -61,7 +61,40 @@ import {
     );
   }
   function NFTPage(props){
-    
+    const [nftList, setNFTList] = useState([]);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await rpc.get_table_rows({
+                  json: true,
+                  code: 'eosio.nft',
+                  scope: props.account.account_name, 
+                  table: 'assets',
+                  limit: 100 
+                });
+                let my_nft = [];
+                response.rows.forEach(function(nft){
+                  my_nft.push(nft.immutable_serialized_data[0].value[1])
+                })
+                setNFTList(my_nft)
+                console.log(my_nft)
+              } catch (error) {
+                console.error('Error:', error);
+              }
+        };
+        fetchData();
+      }, []); 
+        return(
+            <>
+            <div className='nft_container'>
+                {nftList.map((nft,index) => (
+                    <>
+                    <img src={'https://ipfs.io/ipfs/' + nft} className='nft_item'></img>
+                    </>
+                ))}
+            </div>
+            </>
+        );
   }
   function Accounts(){
         return(
