@@ -10,8 +10,17 @@ import {
     getComponentStack,
   } from 'react-chrome-extension-router';
   import './CreateAccount.css';
+
   import axios from 'axios';
   import MainPage from '../MainPage/MainPage';
+  import { Api, JsonRpc, RpcError } from 'eosjs';
+import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig.js';
+
+
+  import { Buffer } from 'buffer';
+  var global = global || window;
+  global.Buffer = global.Buffer || require("buffer").Buffer;
+
   async function postJSON(url = "", data = {}) {
     try {
       const response = await fetch(url, {
@@ -30,7 +39,8 @@ import {
       console.error("postJSON Error:", error);
     }
   }
-  
+  const rpc = new JsonRpc('http://14.63.34.160:8888');
+
   async function account_store(new_account) {
   
     // 1. 현재 chrome.storage에 저장된 키 값들의 배열을 가져오고
@@ -72,7 +82,70 @@ import {
     const [accountName, setAccountName] = useState('');
     const [isValidAccount, setIsValidAccount] = useState(true);
     const [tid, setTid] = useState('');
+    async function createAccount_eos(data_for_account){
+      const signatureProvider = new JsSignatureProvider(['5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3']);
+      const hep = new Api({rpc,signatureProvider});
+      const {createName, publicKey} = data_for_account;
   
+        try {
+            
+            const result = await hep.transact({
+                actions: [{
+                    account: 'eosio',
+                    name: 'newaccount',
+                    authorization: [{
+                      actor: 'eosio',  // 새 계정 생성자
+                      permission: 'active',
+                    }],
+                    data: {
+                      creator: 'eosio',  // 새 계정 생성자
+                      name: createName,  // 새 계정 이름
+                      owner: {
+                        threshold: 1,
+                        keys: [{
+                          key: publicKey,  
+                          weight: 1,
+                        }],
+                        accounts: [],
+                        waits: [],
+                      },
+                      active: {
+                        threshold: 1,
+                        keys: [{
+                          key: publicKey,
+                          weight: 1,
+                        }],
+                        accounts: [],
+                        waits: [],
+                      },
+                    },
+                    
+                  },
+                  {
+                    account: 'eosio',
+                    name: 'buyrambytes',
+                    authorization: [{
+                      actor: 'eosio',
+                      permission: 'active',
+                    }],
+                    data: {
+                      payer: 'eosio',
+                      receiver: createName,
+                      bytes: 8192,
+                    },
+                  }]    
+            }, {
+                blocksBehind: 3,
+                expireSeconds: 30,
+            });
+            console.log("ok")
+            return result;
+        }catch(error){
+          console.log(error);
+          return 0;
+        }
+         
+    }
     const handleAccountNameChange = (event) => {
         const value = event.target.value.replace(/[^a-zA-Z.1-5]/g, '');
         setAccountName(value);
@@ -81,7 +154,7 @@ import {
         // 계정 생성 관련 핸들러
         createAccount();
       };
-    
+
       const createAccount = async () => {
         
         try {
@@ -122,11 +195,19 @@ import {
               publicKey: publicKey
             };
           
-          const result_publicKeyAccount = await postJSON(url_for_publicKeyAccount, {datas : data_for_publicKeyAccount});
-          const publicKeyAccount = result_publicKeyAccount.accounts;
+            let result_publicKeyAccount;
+
+              try {
+                const accounts = await rpc.history_get_key_accounts(publicKey);
+                result_publicKeyAccount = accounts.account_names;
+                
+              }catch(error){
+                console.error(error)
+                result_publicKeyAccount = 'error';
+              }
           console.log("createAccount : 계정조회 결과")
-          console.log(publicKeyAccount)
-          if(Array.isArray(publicKeyAccount) && publicKeyAccount.length !== 0) {
+          console.log(result_publicKeyAccount)
+          if(Array.isArray(result_publicKeyAccount) && result_publicKeyAccount.length !== 0) {
             console.log("이미 계정이 존재하는 public key입니다.")
             return;
           }    
@@ -142,18 +223,18 @@ import {
               publicKey: publicKey,
             };
     
-          const response_account = await postJSON(url_for_account, {datas : data_for_account});
-          if(response_account.status == "SUCCESS") {
-              
+            const response_account = await createAccount_eos(data_for_account);
+          if(response_account === 0) {
+            console.log("계정생성 실패")
+            
+          } else {
             console.log("계정생성 성공")
-            console.log("트랜잭션 아이디 : "+response_account.result.transaction_id);
-            setTid(response_account.result.transaction_id)
+            console.log("트랜잭션 아이디 : "+response_account.transaction_id);
+            setTid(response_account.transaction_id)
             
             const new_account = {account_name : accountName, publicKey :publicKey, privateKey : privateKey }
             account_store(new_account); // 계정 생성에 성공하면 해당 계정을 storage에 저장한다.
             goTo(MainPage);
-          } else {
-            console.log("계정생성 실패")
           }
     
         

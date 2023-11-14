@@ -15,7 +15,12 @@ import {
   import link_img from '../../assets/web.png'
   import More from '../../assets/more.png';
   import axios from 'axios';
-
+  import { Api, JsonRpc, RpcError } from 'eosjs';
+  import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig.js';
+  import { Buffer } from 'buffer';
+    var global = global || window;
+    global.Buffer = global.Buffer || require("buffer").Buffer;
+    const rpc = new JsonRpc('http://14.63.34.160:8888');
   export default function Vote() {
     const [account, setAccount] = useState([]);
     const [producers, setProducers] = useState([]);
@@ -25,63 +30,51 @@ import {
     const fetchDataFromHep = async () => {
 
       };
-    const voteProducer = () => {
-        const apiUrl = 'http://221.148.25.234:8989/voteProducer';
-        const data = {
-          datas: {
-            voterPrivateKey: privateKey,
-            voterName: account.account_name, // 실제 데이터 값
-            producerName: selectProducer,
+    const voteProducer = async() => {
+      const signatureProvider = new JsSignatureProvider([privateKey]);
+      const hep = new Api({rpc,signatureProvider});
+          try{
+            const result = await hep.transact({
+              actions: [{
+                account: 'eosio',
+                name: 'voteproducer',
+                authorization: [{
+                  actor: account.account_name,
+                  permission: 'active',
+                }],
+                data: {
+                  voter: account.account_name,
+                  proxy: '',
+                  producers: selectProducer
+                },
+              }]
+            }, {
+              blocksBehind: 3,
+              expireSeconds: 30,
+              broadcast: true,
+              sign: true
+            });
+            alert("투표에 성공하였습니다.")
+            goBack();
+          }catch(error){
+            alert("투표에 실패하였습니다.")
+            console.log(error);
           }
-        };
-        // POST 요청 보내기
-        fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data)
-        })
-          .then(response => response.json())
-          .then(data => {
-            console.log(data);
-            if(data.status ==='SUCCESS')
-              {
-                alert("투표에 성공하였습니다.")
-                goBack();
-                // setResult("트랜잭션 완료 ID : "+data.result.transaction_id);
-                // setHeader("투표 성공");
-              }else
-              {
-                alert("투표에 실패하였습니다.")
-                // setResult("투표 실패하였습니다.");
-                // setHeader("투표 실패");
-              }
-              //openModal();
-          })
-          .catch(error => {
-            console.error('Error posting data:', error);
-          });
       };
 
-      const GetProducers = () => {
-        const apiUrl = 'http://221.148.25.234:8989/getProducerList';
-    
-        // POST 요청 보내기
-        fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
+      const GetProducers = async() => {
+          try {
+            let producerLength = 0;
+            let producerData;
+            while (producerLength <= 24) {
+              producerData = await rpc.get_producers(true, '', 100);
+              producerLength = producerData.rows.length;
+            }
+            producerData.rows.sort((a, b) => parseFloat(b.total_votes) - parseFloat(a.total_votes));
+            setProducers(producerData.rows);
+          }catch(error){
+            console.error(error)
           }
-        })
-          .then(response => response.json())
-          .then(data => {
-            console.log(data);
-            setProducers(data.producers);
-          })
-          .catch(error => {
-            console.error('Error posting data:', error);
-          });
       };
     
       useEffect(() => {
@@ -100,11 +93,15 @@ import {
     const fetchData = async () => {
         try {
           const result = await chrome.storage.local.get(["selectAccount"]);
-          const response = await axios.post('http://221.148.25.234:8989/getAccountInfo',
-          {accountName : result.selectAccount.account_name});
-          const account_result = response.data.account;
-          setPrivateKey(result.selectAccount.privateKey);
-          setAccount(account_result);
+          try{
+            const account_request = await rpc.get_account(result.selectAccount.account_name);
+            setAccount(account_request);
+            const account_result = account_request;
+            setPrivateKey(result.selectAccount.privateKey);
+            setAccount(account_result);
+          }catch(error){
+            console.log(error);
+          }
         } catch (error) {
           console.error('Error fetching transaction data:', error);
         }

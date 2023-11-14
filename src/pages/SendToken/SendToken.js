@@ -14,7 +14,12 @@ import {
   import DownArrow from '../../assets/down_arrow.png';
   import More from '../../assets/more.png';
   import axios from 'axios';
-
+  import { Api, JsonRpc, RpcError } from 'eosjs';
+  import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig.js';
+  import { Buffer } from 'buffer';
+    var global = global || window;
+    global.Buffer = global.Buffer || require("buffer").Buffer;
+    const rpc = new JsonRpc('http://14.63.34.160:8888');
 
   export default function MainPage() {
     const [account, setAccount] = useState([]);
@@ -25,11 +30,16 @@ import {
     const fetchData = async () => {
         try {
           const result = await chrome.storage.local.get(["selectAccount"]);
-          const response = await axios.post('http://221.148.25.234:8989/getAccountInfo',
-          {accountName :  result.selectAccount.account_name});
-          const account_result = response.data.account;
-          setPrivateKey(result.selectAccount.privateKey);
-          setAccount(account_result);
+          try{
+            const account_request = await rpc.get_account(result.selectAccount.account_name);
+            setAccount(account_request);
+            const account_result = account_request;
+            setPrivateKey(result.selectAccount.privateKey);
+            setAccount(account_result);
+          }catch(error){
+            console.log(error);
+          }
+          
         } catch (error) {
           console.error('Error fetching transaction data:', error);
         }
@@ -58,20 +68,34 @@ import {
         setInputAccount(newValue);
       }
       const sendTokenEvent = async () => {{
-        const response = await axios.post('http://221.148.25.234:8989/sendTokens',
-          {datas : {senderPrivateKey : privateKey,
-          senderName : account.account_name ,
-           receiverName : inputAccount,
-           quantity : inputValue + ".0000",
-            memo : "sendToken"
-        }});
-          const trx_result = response.data.status;
-          if(trx_result === "SUCCESS"){
+        const signatureProvider = new JsSignatureProvider([privateKey]);
+        const hep = new Api({rpc,signatureProvider});
+        try {
+          const result = await hep.transact({
+              actions: [{
+                account: 'eosio.token',
+                name: 'transfer',
+                authorization: [{
+                  actor: account.account_name,
+                  permission: 'active',
+                }],
+                data: {
+                  from: account.account_name,
+                  to: inputAccount,
+                  quantity: inputValue + ".0000" + ' HEP',
+                  memo: "sendToken",
+                },
+              }]
+            }, {
+              blocksBehind: 3,
+              expireSeconds: 30,
+            });
             alert("토큰 전송에 성공하였습니다.")
             goBack();
-          }else {
-            alert("토큰 전송에 실패하였습니다.")
-          }
+      }catch(error){
+        alert("토큰 전송에 실패하였습니다.")
+        console.log(error);
+      }
       }}
     return(
         <>

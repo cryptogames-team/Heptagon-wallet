@@ -1,6 +1,8 @@
 /*
     디앱 트랜잭션 관련 파일
 */
+// importScripts('../../../node_modules/eosjs');
+// const { Api, JsonRpc, RpcError,JsSignatureProvider } = eosjs;
 
 let popupWindow = null; // 팝업창의 id를 저장한다.
 let tab_id_vote = null; // 해당 버튼을 누른 tab의 id를 저장한다.
@@ -21,7 +23,10 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
         data = JSON.parse(message.data);
         action_account = message.action_account;
         action_name = message.action_name;
-
+        chrome.storage.local.set({auth_name : auth_name});
+        chrome.storage.local.set({data : data});
+        chrome.storage.local.set({action_account : action_account});
+        chrome.storage.local.set({action_name : action_name});
         // request_state 저장. 이 정보를 통해 index.html이 팝업창에 어떤 ui를 띄어줄지 결정한다.        
         chrome.storage.local.set({request_state : "dapp_trx"}).then(() => {
             
@@ -53,7 +58,8 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 
       auth_name = message.auth_name;
       datas_by_front = JSON.parse(message.datas);
-
+      chrome.storage.local.set({auth_name : auth_name});
+      chrome.storage.local.set({datas_by_front : datas_by_front});
       // request_state 저장. 이 정보를 통해 index.html이 팝업창에 어떤 ui를 띄어줄지 결정한다.        
       chrome.storage.local.set({request_state : "dapp_trxs"}).then(() => {
           
@@ -110,68 +116,63 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 
 // 버튼을 누르면 input태그에 있는 auth_name, data, action_account, action_name을 가져온다.
 async function trxs_process() {
+  const result = await chrome.storage.local.get(['result']);
+  const status = await chrome.storage.local.get(['status']);
+  trxs_complete({result : result.result, status : status.status});
+    // // 계정들을 가져오고
+    // const result_accounts = await chrome.storage.local.get(['accounts']);
+    // const accounts = result_accounts.accounts;
 
-    // 계정들을 가져오고
-    const result_accounts = await chrome.storage.local.get(['accounts']);
-    const accounts = result_accounts.accounts;
+    // console.log("계정 가져오기");
+    // console.log(accounts);
 
-    console.log("계정 가져오기");
-    console.log(accounts);
+    // // 그 중에서 account_name에 매칭되는 privateKey를 추출한다.
+    // const filteredData = accounts.filter(item => item.account_name === auth_name);
 
-    // 그 중에서 account_name에 매칭되는 privateKey를 추출한다.
-    const filteredData = accounts.filter(item => item.account_name === auth_name);
+    // if (filteredData.length < 0) {
+    //     console.log('일치하는 데이터를 찾을 수 없습니다.');
+    //     return false;
+    // }
 
-    if (filteredData.length < 0) {
-        console.log('일치하는 데이터를 찾을 수 없습니다.');
-        return false;
-    }
-
-    console.log(filteredData);
-    const senderPrivateKey = filteredData[0].privateKey;
-    console.log("가지고 온 privateKey "+senderPrivateKey)
-
-    const url = "http://221.148.25.234:8989/startTransactions";
-    const datas = {
-        senderPrivateKey,
-        auth_name,
-        datas : datas_by_front
-    };
+    // console.log(filteredData);
+    // const senderPrivateKey = filteredData[0].privateKey;
+    // console.log("가지고 온 privateKey "+senderPrivateKey)
+    // const signatureProvider = new JsSignatureProvider([senderPrivateKey]);
+    // const hep = new Api({rpc,signatureProvider});
+    // let results = [];
+    // datas_by_front.forEach(async function(data){
+    //   try {
+    //     const result = await hep.transact({
+    //         actions: [{
+    //           account: data.action_account,
+    //           name: data.action_name,
+    //           authorization: [{
+    //             actor: auth_name,
+    //             permission: 'active',
+    //           }],
+    //           data: data.data,
+    //         }]
+    //       }, {
+    //         blocksBehind: 3,
+    //         expireSeconds: 30,
+    //       });
+    //       results.push(result.transaction_id)
+          
+    // }catch(error){
+    //   console.log(error)
+    //   trxs_complete({result : error, status : "FAILED"});
+    // }
+    // })
+    // if(results.length > 0){
+    //   trxs_complete({result : results, status : "SUCCESS"});
+    // }
     
-    const response = await postJSON(url, {datas : datas});
-    trxs_complete(response);    
+        
 }
 async function trx_process() {
-
-  // 계정들을 가져오고
-  const result_accounts = await chrome.storage.local.get(['accounts']);
-  const accounts = result_accounts.accounts;
-
-  console.log("계정 가져오기");
-  console.log(accounts);
-
-  // 그 중에서 account_name에 매칭되는 privateKey를 추출한다.
-  const filteredData = accounts.filter(item => item.account_name === auth_name);
-
-  if (filteredData.length < 0) {
-      console.log('일치하는 데이터를 찾을 수 없습니다.');
-      return false;
-  }
-
-  console.log(filteredData);
-  const senderPrivateKey = filteredData[0].privateKey;
-  console.log("가지고 온 privateKey "+senderPrivateKey)
-
-  const url = "http://221.148.25.234:8989/startTransaction";
-  const datas = {
-      senderPrivateKey,
-      auth_name,
-      data,
-      action_account,
-      action_name
-  };
-  
-  const response = await postJSON(url, {datas : datas});
-  trx_complete(response);    
+  const result = await chrome.storage.local.get(['result']);
+  const status = await chrome.storage.local.get(['status']);
+  trx_complete({result : result.result, status : status.status});
 }
 function trx_complete (data) {
 

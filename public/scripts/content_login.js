@@ -1,8 +1,9 @@
 console.log("지갑으로 스크립트 주입 : 크립토 익스플로러 - 로그인 ~ (content_login.js)")
-window.onload = function () {
+
   // 페이지가 로드된 후에 실행할 코드
+  console.log("실행")
   login_inject();
-};
+
 
 
 function login_inject() {

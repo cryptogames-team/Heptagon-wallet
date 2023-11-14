@@ -12,8 +12,16 @@ import {
   // css 모음
 import './DappSign.css'
 import Logo from '../../assets/heptagon_logo_final.png';
+import { Api, JsonRpc, RpcError } from 'eosjs';
+import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig.js';
 
+  var global = global || window;
+  global.Buffer = global.Buffer || require("buffer").Buffer;
+  const rpc = new JsonRpc('http://14.63.34.160:8888');
 export default function DappSigns() {
+    const [privateKey,setPrivateKey] = useState('');
+    const [authName,setAuthName] = useState('');
+    const [actionData,setActionData] = useState('');
     const handleRequestTrx = () => {
         
         chrome.runtime.sendMessage(
@@ -27,6 +35,64 @@ export default function DappSigns() {
             { action: "trx_close"}
         );
     };
+    const startTransactions = async() =>{
+        const signatureProvider = new JsSignatureProvider([privateKey]);
+        const hep = new Api({rpc,signatureProvider});
+        let results = [];
+        actionData.forEach(async function(data){
+        try {
+            const result = await hep.transact({
+                actions: [{
+                account: data.action_account,
+                name: data.action_name,
+                authorization: [{
+                    actor: authName,
+                    permission: 'active',
+                }],
+                data: data.data,
+                }]
+            }, {
+                blocksBehind: 3,
+                expireSeconds: 30,
+            });
+            results.push(result.transaction_id)
+            
+        }catch(error){
+        console.log(error)
+        chrome.storage.local.set({result : error});
+        chrome.storage.local.set({status : "FAILED"});
+          chrome.runtime.sendMessage(
+            { action: "trxs_request"}
+        );
+        }
+        })
+        if(results.length > 0){
+            chrome.storage.local.set({result : results});
+            chrome.storage.local.set({status : "SUCCESS"});
+            chrome.runtime.sendMessage(
+              { action: "trxs_request"}
+          ); 
+        }
+    }
+    const fetchData = async () => {
+        try {
+            const auth_name = await chrome.storage.local.get(['auth_name']);
+            const datas_by_front = await chrome.storage.local.get(['datas_by_front']);
+            const result_accounts = await chrome.storage.local.get(['accounts']);
+            const accounts = result_accounts.accounts;
+
+            const filteredData = accounts.filter(item => item.account_name === auth_name.auth_name);
+            const senderPrivateKey = filteredData[0].privateKey;
+            setPrivateKey(senderPrivateKey)
+            setAuthName(auth_name.auth_name)
+            setActionData(datas_by_front.datas_by_front)
+        } catch (error) {
+          console.error('Error fetching transaction data:', error);
+        }
+      };
+    useEffect(() => {
+        fetchData(); 
+      },[]);
     return(
         <>
             <div className='sign_container'>
@@ -48,7 +114,7 @@ export default function DappSigns() {
                 </div>
                 <div className='sign_footer'>
                     <button className='cancel_login_btn'  onClick={handleCloseTrx}>취소</button>
-                    <button className='login_btn' onClick={handleRequestTrx}>서명</button>
+                    <button className='login_btn' onClick={startTransactions}>서명</button>
                 </div>
             </div>
         </>

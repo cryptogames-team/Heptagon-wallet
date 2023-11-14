@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "지갑 - 병합 - 20231103 수정",
+  "name": "Heptagon-Wallet",
   "description": "디앱 연동 및 자산 조회, 투표",
   "version": "1.0",
   "action": {

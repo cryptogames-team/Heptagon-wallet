@@ -24,6 +24,13 @@ import {
   import Vote from '../../pages/Vote/Vote'
   import Resource from '../../pages/StakeResource/StakeResource'
   import AccountsPage from '../AccountsPage/AccountsPage';
+  import { Api, JsonRpc, RpcError } from 'eosjs';
+  import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig.js';
+  import { Buffer } from 'buffer';
+    var global = global || window;
+    global.Buffer = global.Buffer || require("buffer").Buffer;
+    const rpc = new JsonRpc('http://14.63.34.160:8888');
+    
   function ShortenKey({ keyString }) {
     const maxLength = 10; // 원하는 최대 길이
   
@@ -76,15 +83,12 @@ import {
         }
         useEffect(() => {
           const fetchData = async () => {
-            try {
-              const datas = {accountName : props.account.account_name}
-              const response = await axios.post('http://221.148.25.234:8989/getAccountTransaction',
-              {datas : {accountName : props.account.account_name}});
-              const transactions = response.data.result;
-              setTransaction(transactions);
-              console.log(transactions)
-            } catch (error) {
-              console.error('Error fetching transaction data:', error);
+            try{
+                const result = await rpc.history_get_actions(props.account.account_name);
+                const transactions = result.actions;
+                setTransaction(transactions);
+            }catch(error){
+                console.error('Error fetching transaction data:', error);
             }
           };
           fetchData();
@@ -124,10 +128,13 @@ export default function MainPage() {
           const result = await chrome.storage.local.get(["selectAccount"]);
           console.log(result)
           setPublicKey(result.selectAccount.publicKey);
-          const response = await axios.post('http://221.148.25.234:8989/getAccountInfo',
-          {accountName : result.selectAccount.account_name});
-          const account_result = response.data.account;
-          setAccount(account_result);
+          try{
+            const account = await rpc.get_account(result.selectAccount.account_name);
+            setAccount(account);
+          }catch(error){
+            console.log(error);
+          }
+          
         } catch (error) {
           console.error('Error fetching transaction data:', error);
         }

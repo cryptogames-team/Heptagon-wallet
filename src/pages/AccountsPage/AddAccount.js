@@ -1,10 +1,13 @@
 /*global chrome*/
 import React, {useState, useEffect,useRef, forwardRef, } from 'react';
+import { Api, JsonRpc, RpcError } from 'eosjs';
+import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig.js';
 import './AddAccount.css';
 const AddAccount = forwardRef((props, ref) =>{
     const setModalsState = props.setModalsState;
     const [accountName, setAccountName] = useState('');
     const [tid, setTid] = useState('');
+    const rpc = new JsonRpc('http://14.63.34.160:8888');
     let fetchData_parent = props.fetchData;
     const handleAccountNameChange = (event) => {
         const value = event.target.value.replace(/[^a-zA-Z.1-5]/g, '');
@@ -65,6 +68,68 @@ const AddAccount = forwardRef((props, ref) =>{
         chrome.storage.local.set({request_state : "main"});
         fetchData_parent();
       }
+      async function createAccount_eos(createName,publicKey){
+        const signatureProvider = new JsSignatureProvider(['5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3']);
+      const hep = new Api({rpc,signatureProvider});
+          try {
+              
+              const result = await hep.transact({
+                  actions: [{
+                      account: 'eosio',
+                      name: 'newaccount',
+                      authorization: [{
+                        actor: 'eosio',  // 새 계정 생성자
+                        permission: 'active',
+                      }],
+                      data: {
+                        creator: 'eosio',  // 새 계정 생성자
+                        name: createName,  // 새 계정 이름
+                        owner: {
+                          threshold: 1,
+                          keys: [{
+                            key: publicKey,  
+                            weight: 1,
+                          }],
+                          accounts: [],
+                          waits: [],
+                        },
+                        active: {
+                          threshold: 1,
+                          keys: [{
+                            key: publicKey,
+                            weight: 1,
+                          }],
+                          accounts: [],
+                          waits: [],
+                        },
+                      },
+                      
+                    },
+                    {
+                      account: 'eosio',
+                      name: 'buyrambytes',
+                      authorization: [{
+                        actor: 'eosio',
+                        permission: 'active',
+                      }],
+                      data: {
+                        payer: 'eosio',
+                        receiver: createName,
+                        bytes: 8192,
+                      },
+                    }]    
+              }, {
+                  blocksBehind: 3,
+                  expireSeconds: 30,
+              });
+              console.log("ok")
+              return {result : result, status : "SUCCESS"}
+          }catch(error){
+            console.log(error);
+            return {result : error, status : "FAILED"};
+          }
+           
+      }
     const createAccount = async () => {
         
         try {
@@ -104,9 +169,16 @@ const AddAccount = forwardRef((props, ref) =>{
           const data_for_publicKeyAccount = {
               publicKey: publicKey
             };
+            let result_publicKeyAccount;
+              try {
+                const accounts = await rpc.history_get_key_accounts(data_for_publicKeyAccount);
+                result_publicKeyAccount = accounts.account_names;
+              }catch(error){
+                console.error(error)
+                result_publicKeyAccount = 'error';
+              }
           
-          const result_publicKeyAccount = await postJSON(url_for_publicKeyAccount, {datas : data_for_publicKeyAccount});
-          const publicKeyAccount = result_publicKeyAccount.accounts;
+          const publicKeyAccount = result_publicKeyAccount;
           console.log("createAccount : 계정조회 결과")
           console.log(publicKeyAccount)
           if(Array.isArray(publicKeyAccount) && publicKeyAccount.length !== 0) {
@@ -120,12 +192,8 @@ const AddAccount = forwardRef((props, ref) =>{
           const createName = accountName // 계정이름
     
           const url_for_account = "http://221.148.25.234:8989/createAccount";
-          const data_for_account = {
-              createName: createName,
-              publicKey: publicKey,
-            };
-    
-          const response_account = await postJSON(url_for_account, {datas : data_for_account});
+
+          const response_account = await createAccount_eos(createName,publicKey);
           if(response_account.status == "SUCCESS") {
               
             console.log("계정생성 성공")

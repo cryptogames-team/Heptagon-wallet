@@ -1,6 +1,12 @@
 import React, {useState, useEffect,useRef, forwardRef, } from 'react';
 import { Link } from 'react-router-dom';
 import './StakeBtn.css';
+import { Api, JsonRpc, RpcError } from 'eosjs';
+import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig.js';
+import { Buffer } from 'buffer';
+  var global = global || window;
+  global.Buffer = global.Buffer || require("buffer").Buffer;
+  const rpc = new JsonRpc('http://14.63.34.160:8888');
 const StakeBtn = forwardRef((props, ref) =>{
     let wrapperRef = useRef(); //모달창 가장 바깥쪽 태그를 감싸주는 역할
     let type = props.type;
@@ -36,214 +42,143 @@ const StakeBtn = forwardRef((props, ref) =>{
       function BtnEvent(){
         props.setModalState(false);
       }
+      async function unstakeResource(privateKey, accountName, cpuQuantity, netQuantity){
+        const signatureProvider = new JsSignatureProvider([privateKey]);
+        const hep = new Api({rpc,signatureProvider});
+        try {
+            const result = await hep.transact({
+              actions: [{
+                  account: 'eosio',
+                  name: 'undelegatebw',
+                  authorization: [{
+                    actor: accountName,  
+                    permission: 'active',
+                  }],
+                  data: {
+                    from: accountName,  
+                    receiver: accountName,  
+                    unstake_net_quantity: netQuantity + " HEP", 
+                    unstake_cpu_quantity: cpuQuantity + " HEP", 
+                    transfer: false,
+                  },
+                }]
+              }, {
+                blocksBehind: 3,
+                expireSeconds: 30,
+              });
+              alert("언스테이킹에 성공하였습니다.")
+              props.setModalState(false);
+        }catch(error){
+            alert("언스테이킹에 실패하였습니다.")
+            props.setModalState(false);
+        }
+      }
+      async function BuyRam(privateKey,accountName,quantity){
+        const signatureProvider = new JsSignatureProvider([privateKey]);
+        const hep = new Api({rpc,signatureProvider});
+        try {
+            const result = await hep.transact({
+              actions: [{
+                  account: 'eosio',
+                  name: 'buyram',
+                  authorization: [{
+                    actor: accountName,  // RAM을 구매할 계정
+                    permission: 'active',
+                  }],
+                  data: {
+                    payer: accountName,  // RAM을 구매할 계정
+                    receiver: accountName,  // RAM을 받을 계정
+                    quant: quantity + ' HEP',  // 구매할 RAM 수량
+                  },
+                }]
+              }, {
+                blocksBehind: 3,
+                expireSeconds: 30,
+              });
+              alert("구매에 성공하였습니다.")
+              props.setModalState(false);
+        }catch(error){
+            alert("구매에 실패하였습니다.")
+            props.setModalState(false);
+        }
+      }
+      async function SellRam(privateKey,accountName,bytes){
+        const signatureProvider = new JsSignatureProvider([privateKey]);
+        const hep = new Api({rpc,signatureProvider});
+        try {
+            const result = await hep.transact({
+              actions: [{
+                  account: 'eosio',
+                  name: 'sellram',
+                  authorization: [{
+                    actor: accountName,  
+                    permission: 'active',
+                  }],
+                  data: {
+                    account: accountName,  
+                    bytes: bytes,  
+                  },
+                }]
+              }, {
+                blocksBehind: 3,
+                expireSeconds: 30,
+              });
+              alert("판매에 성공하였습니다.")
+            props.setModalState(false);
+        }catch(error){
+            alert("판매에 실패하였습니다.")
+            props.setModalState(false);
+        }
+      }
+      async function StakeResource(privateKey, accountName, cpuQuantity, netQuantity){
+        const signatureProvider = new JsSignatureProvider([privateKey]);
+        const hep = new Api({rpc,signatureProvider});
+        try {
+            const result = await hep.transact({
+              actions: [{
+                  account: 'eosio',
+                  name: 'delegatebw',
+                  authorization: [{
+                    actor: accountName,  // CPU 스테이킹을 할 계정
+                    permission: 'active',
+                  }],
+                  data: {
+                    from: accountName,  // CPU 스테이킹을 할 계정
+                    receiver: accountName,  // CPU 스테이킹을 할 계정
+                    stake_net_quantity: netQuantity + " HEP",  // 네트워크 스테이킹 수량 (0으로 설정하려면 해당 필드를 제거하세요)
+                    stake_cpu_quantity: cpuQuantity + " HEP",  // CPU 스테이킹 수량
+                    transfer: false,
+                  },
+                }]
+              }, {
+                blocksBehind: 3,
+                expireSeconds: 30,
+              });
+              alert("스테이킹에 성공하였습니다.")
+            props.setModalState(false);
+        }catch(error){
+            alert("스테이킹에 실패하였습니다.")
+            props.setModalState(false);
+        }
+      }
       function StakeAction(){
         if(type === 'CPU'){
             if(stake === 'stake'){
-                const apiUrl = 'http://221.148.25.234:8989/resourceStaking';
-                const data = {
-                datas: {
-                    privateKey: privateKey,
-                    accountName: account.account_name, // 실제 데이터 값
-                    cpuQuantity: number + ".0000",
-                    netQuantity: '0.0000'
-                }
-                };
-                // POST 요청 보내기
-                fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    if(data.status ==='SUCCESS')
-                    {
-                        alert("스테이킹에 성공하였습니다.")
-                        props.setModalState(false);
-                    }else
-                    {
-                        alert("스테이킹에 실패하였습니다.")
-                        props.setModalState(false);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error posting data:', error);
-                });
+                StakeResource(privateKey,account.account_name,number + ".0000",'0.0000');
             }else {
-                const apiUrl = 'http://221.148.25.234:8989/unstakeResource';
-                const data = {
-                datas: {
-                    privateKey: privateKey,
-                    accountName: account.account_name, // 실제 데이터 값
-                    cpuQuantity: number + ".0000",
-                    netQuantity: "0.0000"
-                }
-                };
-                // POST 요청 보내기
-                fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    if(data.status ==='SUCCESS')
-                    {
-                        alert("언스테이킹에 성공하였습니다.")
-                        props.setModalState(false);
-                    }else
-                    {
-                        alert("언스테이킹에 실패하였습니다.")
-                        props.setModalState(false);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error posting data:', error);
-                });
+                unstakeResource(privateKey,account.account_name,number + ".0000","0.0000");
             }
         }else if(type === 'NET'){
             if(stake === 'stake'){
-                const apiUrl = 'http://221.148.25.234:8989/resourceStaking';
-                const data = {
-                datas: {
-                    privateKey: privateKey,
-                    accountName: account.account_name, // 실제 데이터 값
-                    cpuQuantity: "0.0000",
-                    netQuantity: number + '.0000'
-                }
-                };
-                // POST 요청 보내기
-                fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    if(data.status ==='SUCCESS')
-                    {
-                        alert("스테이킹에 성공하였습니다.")
-                        props.setModalState(false);
-                    }else
-                    {
-                        alert("스테이킹에 실패하였습니다.")
-                        props.setModalState(false);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error posting data:', error);
-                });
+                StakeResource(privateKey,account.account_name,"0.0000",number + '.0000');
             }else {
-                const apiUrl = 'http://221.148.25.234:8989/unstakeResource';
-                const data = {
-                datas: {
-                    privateKey: privateKey,
-                    accountName: account.account_name, // 실제 데이터 값
-                    cpuQuantity: "0.0000",
-                    netQuantity: number + ".0000"
-                }
-                };
-                // POST 요청 보내기
-                fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    if(data.status ==='SUCCESS')
-                    {
-                        alert("언스테이킹에 성공하였습니다.")
-                        props.setModalState(false);
-                    }else
-                    {
-                        alert("언스테이킹에 실패하였습니다.")
-                        props.setModalState(false);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error posting data:', error);
-                });
+                unstakeResource(privateKey,account.account_name,"0.0000",number + ".0000");
             }
         }else {
             if(stake === 'stake'){
-                const apiUrl = 'http://221.148.25.234:8989/buyRam';
-                const data = {
-                datas: {
-                    privateKey: privateKey,
-                    accountName: account.account_name, // 실제 데이터 값
-                    quantity: number + ".0000"
-                }
-                };
-                // POST 요청 보내기
-                fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    if(data.status ==='SUCCESS')
-                    {
-                        alert("구매에 성공하였습니다.")
-                        props.setModalState(false);
-                    }else
-                    {
-                        alert("구매에 실패하였습니다.")
-                        props.setModalState(false);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error posting data:', error);
-                });
+                BuyRam(privateKey,account.account_name,number+".0000");
             }else {
-                const apiUrl = 'http://221.148.25.234:8989/sellRam';
-                const data = {
-                datas: {
-                    privateKey: privateKey,
-                    accountName: account.account_name, // 실제 데이터 값
-                    bytes: number
-                }
-                };
-                // POST 요청 보내기
-                fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    if(data.status ==='SUCCESS')
-                    {
-                        alert("판매에 성공하였습니다.")
-                        props.setModalState(false);
-                    }else
-                    {
-                        alert("판매에 실패하였습니다.")
-                        props.setModalState(false);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error posting data:', error);
-                });
+                SellRam(privateKey,account.account_name,number)
             }
         }
       }

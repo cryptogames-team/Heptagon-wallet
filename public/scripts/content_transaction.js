@@ -1,8 +1,8 @@
 console.log("지갑으로 스크립트 주입 : 크립토 익스플로러 - 트랜잭션 처리 ~ (content_transaction.js)")
-window.onload = function () {
+
   // 페이지가 로드된 후에 실행할 코드
   transaction_inject();
-};
+
 
 function transaction_inject() {
   const btn_transaction = document.getElementById("transaction");

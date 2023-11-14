@@ -15,6 +15,12 @@ import {
   import More from '../../assets/more.png';
   import DownArrow from '../../assets/down_arrow.png';
   import StakeBtn from './StakeBtn'
+  import { Api, JsonRpc, RpcError } from 'eosjs';
+  import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig.js';
+  import { Buffer } from 'buffer';
+    var global = global || window;
+    global.Buffer = global.Buffer || require("buffer").Buffer;
+    const rpc = new JsonRpc('http://14.63.34.160:8888');
   export default function StakeResource() {
     const [ModalState, setModalState] = useState(false); 
     const [account, setAccount] = useState([]);
@@ -24,12 +30,15 @@ import {
     const fetchData = async () => {
         try {
         const result = await chrome.storage.local.get(["selectAccount"]);
-          const response = await axios.post('http://221.148.25.234:8989/getAccountInfo',
-          {accountName : result.selectAccount.account_name});
-          setPrivateKey(result.selectAccount.privateKey);
-          const account_result = response.data.account;
-          setAccount(account_result);
-          console.log(account)
+          try{
+            const account_request = await rpc.get_account(result.selectAccount.account_name);
+            setAccount(account_request);
+            const account_result = account_request;
+            setPrivateKey(result.selectAccount.privateKey);
+            setAccount(account_result);
+          }catch(error){
+            console.log(error);
+          }
         } catch (error) {
           console.error('Error fetching transaction data:', error);
         }
