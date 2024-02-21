@@ -74,7 +74,12 @@ import {
                 });
                 let my_nft = [];
                 response.rows.forEach(function(nft){
-                  my_nft.push(nft.immutable_serialized_data[0].value[1])
+                  for(let i = 0; i < nft.immutable_serialized_data.length; i++){
+                    if(nft.immutable_serialized_data[i].key === 'img'){
+                        my_nft.push(nft.immutable_serialized_data[i].value[1])
+                    }
+                  }
+                  
                 })
                 setNFTList(my_nft)
                 console.log(my_nft)
