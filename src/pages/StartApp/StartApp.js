@@ -3,6 +3,8 @@ import './StartApp.css';
 import Logo from '../../assets/heptagon_size.png';
 import BlockChain from '../../assets/blockchain.png';
 import CreatePW from '../CreatePW/CreatePW'
+import RecoveryAccount1 from '../RecoveryAccount1/RecoveryAccount1';
+
 import {
     goBack,
     goTo,
@@ -28,8 +30,8 @@ export default function StartApp() {
 
     const handleGetWalletClick = () => {
         if (isChecked) {
-            console.log('기존 지갑 가져오기 버튼 클릭');
-
+            console.log('기존 지갑 가져오기 버튼 클릭12');
+            goTo(RecoveryAccount1);
         }
     }
     return (

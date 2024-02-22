@@ -21,22 +21,6 @@
  background-color: white; /* 아이템 배경색 */
  position: relative; /* 포지션 설정 추가 */
 }
-.circle-text-confirm-item2
-{
- font-size: small;
- width: 120px;
- height: 30px;
- display: flex;
- justify-content: center;
- align-items: center;
- box-shadow: 0 0 0 1px;
- border-radius: 12px; /* 동그란 테두리로 만들기 */
- 
- margin-inline: 20px;
- margin-block: 15px;
- background-color: white; /* 아이템 배경색 */
- position: relative; /* 포지션 설정 추가 */
-}
 .circle-text-input {
     text-align: center;
     border: none;
