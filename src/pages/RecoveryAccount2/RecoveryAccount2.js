@@ -36,6 +36,7 @@ export default function RecoveryAccount2() {
             console.log("현재 선택된 계정",results)
 
             chrome.storage.local.set({request_state : "main"});
+            chrome.storage.local.set({isMnemonicStore : true});
             goTo(MainPage);
         }
     }

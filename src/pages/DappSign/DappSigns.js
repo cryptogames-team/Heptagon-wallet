@@ -39,40 +39,38 @@ export default function DappSigns() {
         const signatureProvider = new JsSignatureProvider([privateKey]);
         const hep = new Api({rpc,signatureProvider});
         let results = [];
-        actionData.forEach(async function(data){
-        try {
-            const result = await hep.transact({
-                actions: [{
-                account: data.action_account,
-                name: data.action_name,
-                authorization: [{
-                    actor: authName,
-                    permission: 'active',
-                }],
-                data: data.data,
-                }]
-            }, {
-                blocksBehind: 3,
-                expireSeconds: 30,
-            });
-            console.log("result 확인", result.transaction_id);
-            results.push(result.transaction_id)
-            
-        }catch(error){
-        console.log(error)
-        chrome.storage.local.set({result : error});
-        chrome.storage.local.set({status : "FAILED"});
-          chrome.runtime.sendMessage(
-            { action: "trxs_request"}
-        );
-        }
-        })
+        const promises = actionData.map(async (data) => {
+            try {
+                const result = await hep.transact({
+                    actions: [{
+                        account: data.action_account,
+                        name: data.action_name,
+                        authorization: [{
+                            actor: authName,
+                            permission: 'active',
+                        }],
+                        data: data.data,
+                    }]
+                }, {
+                    blocksBehind: 3,
+                    expireSeconds: 30,
+                });
+                results.push(result.transaction_id)
 
-        console.log("여기 찍히나 확인 1", results);
+            } catch (error) {
+                console.log(error)
+                chrome.storage.local.set({ result: error });
+                chrome.storage.local.set({ status: "FAILED" });
+                chrome.runtime.sendMessage(
+                    { action: "trxs_request" }
+                );
+            }
+        });
+        await Promise.all(promises);
+
         if(results.length > 0){
             chrome.storage.local.set({result : results});
             chrome.storage.local.set({status : "SUCCESS"});
-            console.log("여기 찍히나 확인 2");
             chrome.runtime.sendMessage(
               { action: "trxs_request"}
           ); 
