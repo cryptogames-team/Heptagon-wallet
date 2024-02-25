@@ -55,6 +55,7 @@ export default function DappSigns() {
                 blocksBehind: 3,
                 expireSeconds: 30,
             });
+            console.log("result 확인", result.transaction_id);
             results.push(result.transaction_id)
             
         }catch(error){
@@ -66,9 +67,12 @@ export default function DappSigns() {
         );
         }
         })
+
+        console.log("여기 찍히나 확인 1", results);
         if(results.length > 0){
             chrome.storage.local.set({result : results});
             chrome.storage.local.set({status : "SUCCESS"});
+            console.log("여기 찍히나 확인 2");
             chrome.runtime.sendMessage(
               { action: "trxs_request"}
           ); 
