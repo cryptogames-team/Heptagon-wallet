@@ -23,6 +23,11 @@ function App() {
   const [componentsToRender, setComponentsToRender] = useState([]);
   
   useEffect(() => {
+
+    chrome.storage.local.get(['user_mnemonic'], (result) => {
+      console.log(`니모닉`, result);
+    });
+
     chrome.storage.local.get(['request_state'], (result) => {
       const storedData = result.request_state;
       setRequest(storedData);
